@@ -1,0 +1,67 @@
+PDS_VERSION_ID                = PDS3
+RECORD_TYPE                   = FIXED_LENGTH
+FILE_RECORDS                  = 2880
+RECORD_BYTES                  = 11520
+^IMAGE                        = "MEGC90N000EB.IMG"
+DATA_SET_ID                   = "MGS-M-MOLA-5-MEGDR-L3-V1.0"
+PRODUCT_ID                    = "MEGC90N000EB.IMG"
+SPACECRAFT_NAME               = "MARS GLOBAL SURVEYOR"
+INSTRUMENT_ID                 = MOLA
+INSTRUMENT_NAME               = "MARS ORBITER LASER ALTIMETER"
+TARGET_NAME                   = MARS
+START_TIME                    = 1997-09-15T19:10:00.000
+STOP_TIME                     = 2001-06-30T11:10:40.000
+START_ORBIT_NUMBER            = 3
+STOP_ORBIT_NUMBER             = 20333
+PRODUCT_CREATION_TIME         = 2003-04-03T01:00:00
+PRODUCT_VERSION_ID            = "2.0"
+PRODUCER_ID                   = MGS_MOLA_TEAM
+PRODUCER_FULL_NAME            = "DAVID E. SMITH"
+PRODUCER_INSTITUTION_NAME     = "GODDARD SPACE FLIGHT CENTER"
+DESCRIPTION                   = "This data product accompanies the
+ topographic and shape maps of Mars, at a resolution of 0.0625 (1/16)
+ by 0.0625 degrees. It contains the number of observations per pixel
+ that have been used to produce the data products. The map is in the form
+ of a binary table with one row for each 0.0625-degree latitude. A
+ total of approximately 600 million observations are represented."
+
+OBJECT                        = IMAGE
+ NAME                         = COUNTS_PER_BIN
+ DESCRIPTION                  = "The number of observations, or
+  counts, in a given latitude-longitude bin."
+ LINES                        = 2880
+ LINE_SAMPLES                 = 5760
+ SAMPLE_TYPE                  = MSB_INTEGER
+ SAMPLE_BITS                  = 16
+END_OBJECT                    = IMAGE
+
+OBJECT                        = IMAGE_MAP_PROJECTION
+ ^DATA_SET_MAP_PROJECTION     = "DSMAP.CAT"
+ MAP_PROJECTION_TYPE          = "SIMPLE CYLINDRICAL"
+ A_AXIS_RADIUS                = 3396.0 <KM>
+ B_AXIS_RADIUS                = 3396.0 <KM>
+ C_AXIS_RADIUS                = 3396.0 <KM>
+ FIRST_STANDARD_PARALLEL      = "N/A"
+ SECOND_STANDARD_PARALLEL     = "N/A"
+ POSITIVE_LONGITUDE_DIRECTION = "EAST"
+ CENTER_LATITUDE              = 0.0 <DEGREE>
+ CENTER_LONGITUDE             = 180.0 <DEGREE>
+ REFERENCE_LATITUDE           = "N/A"
+ REFERENCE_LONGITUDE          = "N/A"
+ LINE_FIRST_PIXEL             = 1
+ LINE_LAST_PIXEL              = 2880
+ SAMPLE_FIRST_PIXEL           = 1
+ SAMPLE_LAST_PIXEL            = 5760
+ MAP_PROJECTION_ROTATION      = 0.0
+ MAP_RESOLUTION               = 16.0 <PIXEL/DEGREE>
+ MAP_SCALE                    = 3.705 <KM/PIXEL>
+ MAXIMUM_LATITUDE             = 90.0 <DEGREE>
+ MINIMUM_LATITUDE             = -90.0 <DEGREE>
+ WESTERNMOST_LONGITUDE        = 0.0 <DEGREE>
+ EASTERNMOST_LONGITUDE        = 360.0 <DEGREE>
+ LINE_PROJECTION_OFFSET       = 1440.5
+ SAMPLE_PROJECTION_OFFSET     = 2880.5
+ COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
+ COORDINATE_SYSTEM_NAME       = "PLANETOCENTRIC"
+END_OBJECT                    = IMAGE_MAP_PROJECTION
+END
