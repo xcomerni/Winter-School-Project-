@@ -1,10 +1,10 @@
 PDS_VERSION_ID                = PDS3
 RECORD_TYPE                   = FIXED_LENGTH
-FILE_RECORDS                  = 2880
-RECORD_BYTES                  = 11520
-^IMAGE                        = "MEGT90N000EB.IMG"
+FILE_RECORDS                  = 5632
+RECORD_BYTES                  = 23040
+^IMAGE                        = "MEGT44N000HB.IMG"
 DATA_SET_ID                   = "MGS-M-MOLA-5-MEGDR-L3-V1.0"
-PRODUCT_ID                    = "MEGT90N000EB.IMG"
+PRODUCT_ID                    = "MEGT44N000HB.IMG"
 SPACECRAFT_NAME               = "MARS GLOBAL SURVEYOR"
 INSTRUMENT_ID                 = MOLA
 INSTRUMENT_NAME               = "MARS ORBITER LASER ALTIMETER"
@@ -13,19 +13,19 @@ START_TIME                    = 1997-09-15T19:10:00.000
 STOP_TIME                     = 2001-06-30T11:10:40.000
 START_ORBIT_NUMBER            = 3
 STOP_ORBIT_NUMBER             = 20333
-PRODUCT_CREATION_TIME         = 2003-04-03T01:00:00
+PRODUCT_CREATION_TIME         = 2003-03-21T01:00:00
 PRODUCT_VERSION_ID            = "2.0"
 PRODUCER_ID                   = MGS_MOLA_TEAM
 PRODUCER_FULL_NAME            = "DAVID E. SMITH"
 PRODUCER_INSTITUTION_NAME     = "GODDARD SPACE FLIGHT CENTER"
 DESCRIPTION                   = "This data product is a topographic
- map of Mars at a resolution of 0.0625 (1/16) by 0.0625 degrees, based
- on altimetry data acquired by the Mars Global Surveyor MOLA instrument
- and accumulated over the course of the primary and extended
+ map of Mars at a resolution of 0.00781 (1/128) by 0.00781 degrees,
+ based on altimetry data acquired by the Mars Global Surveyor MOLA
+ instrument and accumulated over the course of the primary and extended
  mission. The MOLA Precision Experiment Data Records (PEDRs) are the
  source for this data set. The map is in the form of a binary table
- with one row for each 0.0625-degree latitude. Map coordinates use the
- IAU2000 reference system, and areoid defined by the Goddard Mars
+ with one row for each 0.00781-degree latitude. Map coordinates use
+ the IAU2000 reference system, and areoid defined by the Goddard Mars
  potential model GMM3 (mgm1025) evaluated to degree and order 50. The
  binned data include all MOLA nadir observations from the Mapping Phase
  through the Primary and Extended missions, from the end of aerobraking
@@ -46,16 +46,16 @@ DESCRIPTION                   = "This data product is a topographic
 OBJECT                        = IMAGE
  NAME                         = MEDIAN_TOPOGRAPHY
  DESCRIPTION                  = "Each sample represents median
-  observed topography within a 0.0625 by 0.0625 degree area. Where no
-  observations lie within the area, an interpolated value is supplied.
-  Owing to the polar MGS orbit, density is lowest near the equator,
-  where about 55% of bins contain at least one MOLA shot.  There are
-  gaps, however, of up to 12 km between profiles.  The minimum and
-  maximum topography observations for the entire data set are -8177
-  and 21171 meters. Topography is the planetary radius minus the
-  areoid radius at a given longitude and latitude."
- LINES                        = 2880
- LINE_SAMPLES                 = 5760
+  observed topography within a 0.00781 by 0.00781 degree area. Where
+  no observations lie within the area, an interpolated value is
+  supplied.  Owing to the polar MGS orbit, density is lowest near the
+  equator, where about 55% of bins contain at least one MOLA shot.
+  There are gaps, however, of up to 12 km between profiles.  The
+  minimum and maximum topography observations for the entire data set
+  are -8208 and 21249 meters. Topography is the planetary radius
+  minus the areoid radius at a given longitude and latitude."
+ LINES                        = 5632
+ LINE_SAMPLES                 = 11520
  SAMPLE_TYPE                  = MSB_INTEGER
  SAMPLE_BITS                  = 16
  UNIT                         = METER
@@ -75,18 +75,18 @@ OBJECT                        = IMAGE_MAP_PROJECTION
  REFERENCE_LATITUDE           = "N/A"
  REFERENCE_LONGITUDE          = "N/A"
  LINE_FIRST_PIXEL             = 1
- LINE_LAST_PIXEL              = 2880
+ LINE_LAST_PIXEL              = 5632
  SAMPLE_FIRST_PIXEL           = 1
- SAMPLE_LAST_PIXEL            = 5760
+ SAMPLE_LAST_PIXEL            = 11520
  MAP_PROJECTION_ROTATION      = 0.0
- MAP_RESOLUTION               = 16.0 <PIXEL/DEGREE>
- MAP_SCALE                    = 3.705 <KM/PIXEL>
- MAXIMUM_LATITUDE             = 90.0 <DEGREE>
- MINIMUM_LATITUDE             = -90.0 <DEGREE>
+ MAP_RESOLUTION               = 128.0 <PIXEL/DEGREE>
+ MAP_SCALE                    = 0.463 <KM/PIXEL>
+ MAXIMUM_LATITUDE             = 44.0 <DEGREE>
+ MINIMUM_LATITUDE             = 0.0 <DEGREE>
  WESTERNMOST_LONGITUDE        = 0.0 <DEGREE>
- EASTERNMOST_LONGITUDE        = 360.0 <DEGREE>
- LINE_PROJECTION_OFFSET       = 1440.5
- SAMPLE_PROJECTION_OFFSET     = 2880.5
+ EASTERNMOST_LONGITUDE        = 90.0 <DEGREE>
+ LINE_PROJECTION_OFFSET       = 5632.5
+ SAMPLE_PROJECTION_OFFSET     = 23040.5
  COORDINATE_SYSTEM_TYPE       = "BODY-FIXED ROTATING"
  COORDINATE_SYSTEM_NAME       = "PLANETOCENTRIC"
 END_OBJECT                    = IMAGE_MAP_PROJECTION

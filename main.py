@@ -8,20 +8,19 @@ from rasterio.enums import Resampling
 from rasterio.windows import from_bounds
 from scipy.ndimage import generic_filter
 import matplotlib.pyplot as plt
+import csv
 
 # -----------------------
 # USER CONFIG
 # -----------------------
 DATA_FOLDER = r"C:\Users\zuzia\Documents\GitHub\Winter-School-Project-\MOLA"
-# Label file for the topography product (you confirmed this exists)
-LBL_FILENAME = "megt90n000eb.lbl"
-IMG_FILENAME = "megt90n000eb.img"
+# Label file for the topography product 
+LBL_FILENAME = "megt44n000hb.lbl"
+IMG_FILENAME = "megt44n000hb.img"
 
 # Output names (will be written into DATA_FOLDER)
 OUT_TOPO_TIF = "mola_topography.tif"
 OUT_SLOPE_TIF = "mola_slope_deg.tif"
-OUT_ROUGH_STD_TIF = "mola_roughness_std.tif"
-OUT_ROUGH_TRI_TIF = "mola_roughness_tri.tif"
 
 # -----------------------
 # Helpers
@@ -111,8 +110,17 @@ else:
 print("📥 Loading topography GeoTIFF with rasterio...")
 
 # Jezero Crater bounding box in METERS (east longitudes)
-jezero_left, jezero_right = 4000000, 5000000
-jezero_bottom, jezero_top = 1000000, 1200000
+
+# jezero_left   = 4580787.111167222  # meters (≈ 74.5°E)
+# jezero_right  = 4630877.603791111   # meters (≈ 80.0°E)
+# jezero_bottom = 1068155.337734444    # meters (≈ 16.5°N)
+# jezero_top    = 1115709.447046667   # meters (≈ 20.0°N)
+
+jezero_left = -6086970
+jezero_right = -6041410
+jezero_bottom = 1068460
+jezero_top = 1115460
+
 
 with rasterio.open(out_topo_tif_path) as src:
     print("📍 Cropping to Jezero region (meters)...")
@@ -164,50 +172,22 @@ print(f"ℹ️ Using pixel size = {pixel_size_m:.2f} m/pixel (from MAP_SCALE in 
 #    Using central differences via numpy.gradient which handles NaN by producing NaN
 # -----------------------
 print("🔢 Computing slope (degrees)...")
-# np.gradient expects spacing for each axis (first axis is rows -> y spacing)
-# We assume square pixels: pixel_size_m for both axis
-# gradient returns [d/dy, d/dx]
-dz_dy, dz_dx = np.gradient(topo, pixel_size_m, pixel_size_m)
+# Calculate pixel spacing in degrees
+pixel_deg = 1 / 128.0  # 128 pixels per degree
+# Mars mean radius in meters
+mars_radius = 3396000.0
+# Center latitude in degrees (Jezero Crater)
+center_lat = 18.4
+# Convert degree spacing to meters
+lat_spacing_m = (np.pi / 180) * mars_radius * pixel_deg
+lon_spacing_m = (np.pi / 180) * mars_radius * pixel_deg * np.cos(np.deg2rad(center_lat))
+# Use these spacings in np.gradient
+dz_dy, dz_dx = np.gradient(topo, lat_spacing_m, lon_spacing_m)
 slope_rad = np.arctan(np.sqrt(dz_dx**2 + dz_dy**2))
 slope_deg = np.degrees(slope_rad)
 
 # mask slope where topo is nan
 slope_deg = np.where(np.isnan(topo), np.nan, slope_deg)
-
-# -----------------------
-# 5. Compute R3: roughness_std (3x3) and roughness_tri (TRI)
-# -----------------------
-print("🔢 Computing roughness products...")
-
-def nanstd_window(values):
-    # generic_filter passes flattened window; compute std ignoring NaNs
-    arr_ = np.array(values)
-    arr_ = arr_.astype(np.float64)
-    arr_ = arr_[~np.isnan(arr_)]
-    if arr_.size == 0:
-        return np.nan
-    return float(np.std(arr_, ddof=0))
-
-# roughness_std: standard deviation in 3x3 window
-roughness_std = generic_filter(topo, nanstd_window, size=3, mode='constant', cval=np.nan)
-
-# roughness_tri: sum of absolute differences to 8 neighbours
-def tri_window(values):
-    # values is flattened 3x3 window with centre at index 4
-    arr = np.array(values).reshape(3,3)
-    center = arr[1,1]
-    if np.isnan(center):
-        return np.nan
-    neigh = arr.flatten()
-    # remove center
-    neigh = np.delete(neigh, 4)
-    # ignore nans in neighbors
-    neigh = neigh[~np.isnan(neigh)]
-    if neigh.size == 0:
-        return np.nan
-    return float(np.sum(np.abs(neigh - center)))
-
-roughness_tri = generic_filter(topo, tri_window, size=3, mode='constant', cval=np.nan)
 
 # -----------------------
 # 6. Prepare profile and save outputs as GeoTIFFs
@@ -230,30 +210,45 @@ def save_tif(path, array, profile):
 
 save_tif(os.path.join(DATA_FOLDER, OUT_TOPO_TIF), topo, out_profile)  # overwrite / confirm topo
 save_tif(os.path.join(DATA_FOLDER, OUT_SLOPE_TIF), slope_deg, out_profile)
-save_tif(os.path.join(DATA_FOLDER, OUT_ROUGH_STD_TIF), roughness_std, out_profile)
-save_tif(os.path.join(DATA_FOLDER, OUT_ROUGH_TRI_TIF), roughness_tri, out_profile)
 
 # -----------------------
-# 7. Quick plotting
+# 7. Export slope grid to CSV
+# -----------------------
+
+n_bins_x = 100
+n_bins_y = 100
+height, width = slope_deg.shape
+bin_height = height // n_bins_y
+bin_width = width // n_bins_x
+
+rows = []
+for i in range(n_bins_y):
+    for j in range(n_bins_x):
+        y_start = i * bin_height
+        y_end = (i + 1) * bin_height if i < n_bins_y - 1 else height
+        x_start = j * bin_width
+        x_end = (j + 1) * bin_width if j < n_bins_x - 1 else width
+        bin_slope = slope_deg[y_start:y_end, x_start:x_end]
+        avg_slope = np.nanmean(bin_slope)
+        rows.append([j, i, avg_slope])
+
+csv_path = os.path.join(DATA_FOLDER, "jezero_slope_grid.csv")
+with open(csv_path, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["x", "y", "avg_slope"])
+    writer.writerows(rows)
+print(f"✅ Exported slope grid to {csv_path}")
+
+# -----------------------
+# 8. Quick plotting
 # -----------------------
 print("📊 Plotting quick figures...")
 vmin_slope, vmax_slope = 0, np.nanpercentile(slope_deg, 98)
-vmin_rstd, vmax_rstd = 0, np.nanpercentile(roughness_std, 98)
-vmin_rtri, vmax_rtri = 0, np.nanpercentile(roughness_tri, 98)
 
-fig, axs = plt.subplots(1, 3, figsize=(18,6))
-im0 = axs[0].imshow(slope_deg, vmin=vmin_slope, vmax=vmax_slope)
-axs[0].set_title("Slope (deg)")
-plt.colorbar(im0, ax=axs[0], shrink=0.7)
-
-im1 = axs[1].imshow(roughness_std, vmin=vmin_rstd, vmax=vmax_rstd)
-axs[1].set_title("Roughness (std dev, m)")
-plt.colorbar(im1, ax=axs[1], shrink=0.7)
-
-im2 = axs[2].imshow(roughness_tri, vmin=vmin_rtri, vmax=vmax_rtri)
-axs[2].set_title("Roughness (TRI, m sum)")
-plt.colorbar(im2, ax=axs[2], shrink=0.7)
-
+plt.figure(figsize=(8,6))
+plt.imshow(slope_deg, vmin=vmin_slope, vmax=vmax_slope)
+plt.title("Slope (deg)")
+plt.colorbar(shrink=0.7)
 plt.tight_layout()
 plt.show()
 
