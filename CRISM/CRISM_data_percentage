@@ -1,0 +1,62 @@
+# Normalize average values
+# Create new columns for normalized values
+df_results['Normalized_D2300'] = 0.0
+df_results['Normalized_BD2210'] = 0.0
+df_results['Normalized_BD1900'] = 0.0
+
+# Iterate through each row
+for index, row in df_results.iterrows():
+    # Normalize Avg_D2300
+    avg_d2300 = row['Avg_D2300']
+    if max_d2300 != min_d2300:
+        df_results.loc[index, 'Normalized_D2300'] = (avg_d2300 - min_d2300) / (max_d2300 - min_d2300)
+    else:
+        df_results.loc[index, 'Normalized_D2300'] = 0.0 # Handle case where max == min
+
+    # Normalize Avg_BD2210
+    avg_bd2210 = row['Avg_BD2210']
+    if max_bd2210 != min_bd2210:
+        df_results.loc[index, 'Normalized_BD2210'] = (avg_bd2210 - min_bd2210) / (max_bd2210 - min_bd2210)
+    else:
+        df_results.loc[index, 'Normalized_BD2210'] = 0.0 # Handle case where max == min
+
+    # Normalize Avg_BD1900
+    avg_bd1900 = row['Avg_BD1900']
+    if max_bd1900 != min_bd1900:
+        df_results.loc[index, 'Normalized_BD1900'] = (avg_bd1900 - min_bd1900) / (max_bd1900 - min_bd1900)
+    else:
+        df_results.loc[index, 'Normalized_BD1900'] = 0.0 # Handle case where max == min
+
+# Display the head of the DataFrame with normalized values
+display(df_results.head())
+
+# Multiply normalized values by 100 to get percentages
+df_results['% Fe/Mg'] = df_results['Normalized_D2300'] * 100
+df_results['% Al-OH'] = df_results['Normalized_BD2210'] * 100
+df_results['% H2O'] = df_results['Normalized_BD1900'] * 100
+
+# Set percentages to 0 for cells where original average was 0 (no data)
+# Check if any of the original average columns were 0 for a given row
+mask_no_data = (df_results['Avg_D2300'] == 0) | (df_results['Avg_BD2210'] == 0) | (df_results['Avg_BD1900'] == 0)
+
+# If all original average values were 0 for a row, set percentages to 0
+# This assumes that if any original average is non-zero, there was some data in the cell.
+# If all were 0, it's likely a cell with no valid data points or where all valid points had a true index value of 0.
+# Given the previous NaN to 0 conversion, a row with all 0s in Avg_ columns likely corresponds to a cell with no valid data.
+mask_all_zeros = (df_results['Avg_D2300'] == 0) & (df_results['Avg_BD2210'] == 0) & (df_results['Avg_BD1900'] == 0)
+
+df_results.loc[mask_all_zeros, '% Fe/Mg'] = 0.0
+df_results.loc[mask_all_zeros, '% Al-OH'] = 0.0
+df_results.loc[mask_all_zeros, '% H2O'] = 0.0
+
+
+# Display the head of the updated DataFrame with percentage columns
+display(df_results.head())
+
+# Define the output file path for the updated CSV
+output_csv_path_updated = os.path.join(OUT_DIR, "mesh_mineral_averages_percentages.csv")
+
+# Write the DataFrame to the specified CSV file
+df_results.to_csv(output_csv_path_updated, index=False)
+
+print(f"✅ File CSV con percentuali (percentuali impostate a 0 per celle senza dati) creato/aggiornato con successo: {output_csv_path_updated}")
