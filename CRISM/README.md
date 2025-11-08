@@ -1,7 +1,7 @@
 # CRISM — RGB, Mesh, Data & Percentages (5-step pipeline)
 
 This README documents the `CRISM` folder and the **execution order** of the codes.  
-The pipeline produces RGB visualizations, a 3D-styled mesh view with axes, and per-cell statistics/percentages for three CRISM indices.
+The pipeline produces RGB visualizations, a 2D-styled mesh view with axes, and per-cell statistics/percentages for three CRISM indices.
 
 ---
 
