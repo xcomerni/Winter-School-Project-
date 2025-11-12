@@ -1,53 +1,61 @@
+# THEMIS SUMMARY
+
 ## Code Summary
+This code processes THEMIS XML metadata and image data to analyze surface temperatures over Jezero across different Local Solar Times (LST), producing mosaics, a 100×100 aggregated grid, diagnostics, and ML-ready tables.
 
-This Colab notebook processes THEMIS (Thermal Emission Imaging System) XML metadata and associated image data to analyze Martian surface temperatures, focusing on a specific region (Jezero crater) across different local solar times (LST).
+## Main Steps
+1. **LST Indexing** – Extract LST from PDS4 XML (`themis_lst_index.csv`) to organize by time of day.
+2. **Mosaicking & Reprojection** – Build median BT mosaics per time window on a common Mars EQC grid; apply georeferencing and scale/offset.
+3. **High-Res Outputs** – Save median BT mosaics and coverage counts as GeoTIFF + PNG.
+4. **Aggregated Grid (100×100)** – Resample to coarser 100×100 grids per fascia and save GeoTIFFs + PNGs.
+5. **Aggregated Visualization** – Show gridded distribution with numeric axes (0–99 for X/Y).
+6. **Summary Charts** – Temperature histograms per fascia; bar chart of mean temperatures across fascias.
+7. **ML Export** – `themis_ML_data_100x100.csv` with `(x, y)` and per-fascia mean temperatures.
+8. **Operational Flags (per timeslot)** – `themis_timeslot_flags_ops.csv` adds per-cell/per-slot flags for THEMIS data quality, rover (strict/soft), and helicopter (survival/energy).
+9. **Operational Zone Maps** – 100×100 plots per fascia: *Bad* / *Good Soft Only* / *Good Strict*.
+10. **Zone Distribution** – Grouped bar chart of operational classes across fascias.
+11. **ML Flags-Only** – `themis_ml_flags_only.csv` with unified status flags per fascia.
 
-**Main Steps:**
+## Outputs (selection)
+- **themis_BT_{time}_median.tif/png** – Median BT mosaics per fascia; **themis_BT_{time}_count.tif** for coverage.
+- **themis_BT_Grid100x100_{time}_median.tif/png** – 100×100 aggregated grids (with 0–99 axes).
+- **themis_TempHist_Grid100x100_{time}.png**, **themis_MeanTemp_Grid100x100_BarChart.png** – Diagnostics.
+- **themis_ML_data_100x100.csv** – ML table with timeslot means.
+- **themis_timeslot_flags_ops.csv** – Per-slot operational flags + reasons.
+- **themis_OperationalZones_{time}.png**, **themis_OperationalZoneDistribution.png** – Operational maps & counts.
 
-1.  **LST Indexing**: Extracts Local Solar Time (LST) from PDS4 THEMIS XML labels for a collection of data files and creates a CSV index (`themis_lst_index.csv`). This helps in categorizing observations by their time of day.
-2.  **Data Mosaicking and Reprojection**: For predefined LST *fascias* (time windows), the script identifies relevant image files, reprojects them onto a common Mars Equidistant Cylindrical (EQC) grid, and generates median temperature mosaics. This process involves handling georeferencing and applying scaling/offset factors from the metadata.
-3.  **High-Resolution Output (TIF & PNG)**: The median temperature mosaics and associated coverage counts (number of images contributing to each pixel) are saved as GeoTIFF files (`.tif`) and corresponding PNG visualizations for easy inspection.
-4.  **Aggregated Grid Generation (100x100)**: The high-resolution median temperature data is resampled into a coarser 100x100 grid for each fascia, effectively averaging temperature values over larger blocks. This aggregated data is also saved as GeoTIFFs.
-5.  **Visualization of Aggregated Data**: PNG visualizations of the 100x100 grids are generated, providing a simplified view of temperature distribution across the region with clear grid coordinates.
-6.  **Summary Charts**: Histograms are created to show the distribution of temperatures within each 100x100 aggregated grid, illustrating temperature variability. A bar chart compares the mean temperatures across all fascias, providing an overview of diurnal temperature changes.
-7.  **Machine Learning Data Export**: A final CSV file (`themis_ML_data_100x100.csv`) is generated, combining the x and y coordinates of the 100x100 grid with the mean temperature values for each fascia. This structured data is suitable for machine learning applications.
+## THEMIS — “When” to operate (per-timeslot thermal sanity + rover/heli)
 
-The notebook provides a comprehensive workflow from raw THEMIS metadata to processed and summarized temperature maps, suitable for further scientific analysis or machine learning tasks.
+### (a) Per-timeslot data quality (THEMIS)
+Outlier filtering per slot with **p10–p90** band, clipped to **[−120, +20] °C**.  
+→ `THEMIS_OK_<slot>`, `THEMIS_reason_<slot>` (“missing_data”, “too_cold_outlier”, “too_warm_outlier”, “good”).
 
+### (b) Rover operational limits (environmental)
+- Preferred component environment: **−40…+40 °C**.  
+- Acceptable with heaters (conservative): **≥ −100 °C**.  
+- **Strict, energy-aware lower bound by slot:**  
+  **morning (05:30, 07:00) ≥ −70 °C; evening (18:30, 19:00) ≥ −60 °C**.  
+→ `ROVER_OK_strict_<slot>`, `ROVER_OK_soft_<slot>`, `ROVER_reason_<slot>` (“ideal”, “energy_pref_slot”, “heater_needed”, “too_cold”, “too_hot”, “missing”).
 
-## List of Outputs Generated
+### (c) Helicopter (Ingenuity-like) limits
+- **Survival:** `T ≥ −100 °C`.  
+- **Energy preference:** `T ≥ −70 °C`.  
+→ `HELI_survival_ok_<slot>`, `HELI_energy_pref_<slot>`, `HELI_reason_<slot>` (“ok”, “cold_high_energy”, “too_cold_survival”, “missing”).
 
-Here is a list of the output files generated by this notebook, along with a brief explanation for each:
+### (d) Combined per-slot decision (GOOD/BAD)
+For each timeslot `<slot>`, let **T** be the brightness temperature (°C) of that slot.
 
-1.  **`/content/themis_lst_index.csv`**
-    *   **Description**: A CSV file indexing all input XML files, their extracted Local Solar Time (LST), and their full file paths. It's used for organizing and selecting images based on LST.
+**STRICT** → `SLOT_GOOD_strict_<slot> = 1` iff  
+1) `THEMIS_OK_<slot> = 1` (within per-slot p10–p90, clipped to [−120, +20] °C);  
+2) `T ≤ +40 °C` **and** `T ≥ strict_min_by_slot` (morning −70 °C; evening −60 °C);  
+3) `T ≥ −100 °C` (helicopter survival).  
+Else `0`.
 
-2.  **`/content/themis_BT_{time_str}_median.tif`** (e.g., `themis_BT_5_30AM_median.tif`)
-    *   **Description**: GeoTIFF files containing the median brightness temperature (BT) mosaic for each defined LST fascia. These are high-resolution gridded temperature maps, reprojected to a common Mars Equidistant Cylindrical projection.
+**SOFT** → `SLOT_GOOD_soft_<slot> = 1` iff  
+1) `THEMIS_OK_<slot> = 1`;  
+2) `T ≤ +40 °C` **and** `T ≥ −100 °C` (rover soft);  
+3) `T ≥ −100 °C` (helicopter survival).  
+Else `0`.
 
-3.  **`/content/themis_BT_{time_str}_count.tif`** (e.g., `themis_BT_5_30AM_count.tif`)
-    *   **Description**: GeoTIFF files indicating, for each pixel in the mosaic, how many individual THEMIS images contributed to its median temperature calculation. This serves as a measure of data coverage and reliability.
-
-4.  **`/content/themis_BT_{time_str}_median.png`** (e.g., `themis_BT_5_30AM_median.png`)
-    *   **Description**: PNG image visualizations of the median brightness temperature mosaics. These plots include a consistent colorbar and geographic coordinates for easy interpretation.
-
-5.  **`/content/themis_Coverage_{time_str}.png`** (e.g., `themis_Coverage_5_30AM.png`)
-    *   **Description**: PNG image visualizations of the coverage count maps. These show the density of input data contributing to each pixel of the temperature mosaic, using a distinct colormap.
-
-6.  **`/content/themis_Diff_7_00PM_vs_5_30AM.png`**
-    *   **Description**: A PNG image visualizing the temperature difference between the `7:00 PM` fascia and the `5:30 AM` fascia. This highlights diurnal temperature variations across the region.
-
-7.  **`/content/themis_BT_Grid100x100_{time_str}_median.tif`** (e.g., `themis_BT_Grid100x100_5_30AM_median.tif`)
-    *   **Description**: GeoTIFF files containing the median brightness temperature, aggregated into a 100x100 grid for each LST fascia. These are coarser resolution temperature maps, useful for broader analysis.
-
-8.  **`/content/themis_BT_Grid100x100_{time_str}_median.png`** (e.g., `themis_BT_Grid100x100_5_30AM_median.png`)
-    *   **Description**: PNG image visualizations of the 100x100 aggregated temperature grids. These plots feature numerical axes (0-99 for X and Y) to represent the grid cells and provide a simplified, gridded view of the temperature distribution.
-
-9.  **`/content/themis_TempHist_Grid100x100_{time_str}.png`** (e.g., `themis_TempHist_Grid100x100_5_30AM.png`)
-    *   **Description**: PNG image visualizations of histograms showing the distribution of temperature values within each 100x100 aggregated grid. The Y-axis represents the 'Frequency (Number of Pixels)'.
-
-10. **`/content/themis_MeanTemp_Grid100x100_BarChart.png`**
-    *   **Description**: A PNG image visualizing a bar chart that compares the mean temperature across all LST fascias, calculated from the 100x100 aggregated grid data. This provides a quick comparison of average temperatures at different times of day.
-
-11. **`/content/themis_ML_data_100x100.csv`**
-    *   **Description**: A CSV file specifically prepared for machine learning tasks. It contains `x` and `y` coordinates (0-99 for the 100x100 grid cells) and the corresponding mean temperature values for each LST fascia (e.g., `mean_temperature_5_30AM`, `mean_temperature_7_00AM`, etc.).
+*Ranking note:* `HELI_energy_pref_<slot> = 1` when `T ≥ −70 °C`.  
+*Auditability:* `SLOT_REASON_strict_<slot>` / `SLOT_REASON_soft_<slot>` store the first failing constraint.
