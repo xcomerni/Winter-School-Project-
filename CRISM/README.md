@@ -128,11 +128,17 @@ Edit the configuration section before running step 1:
 
 ---
 
-## Outputs (summary)
+### Key Outputs:
 
-- **Per scene:** `<scene>_RGB.png`, `<scene>_indices_eqc.tif`  
-- **Mosaic:** `jezero_CRISM_RGB_mosaic.png`, `jezero_CRISM_indices_mosaic.tif`, `jezero_CRISM_RGB_mosaic_meshed.png`  
-- **Tables:** `mesh_mineral_averages.csv`, `mesh_mineral_averages_percentages.csv`
+*   **Individual Scene GeoTIFFs & PNG Quicklooks**: For each input CRISM `_sr*_mtr3.img` file, a GeoTIFF (e.g., `/content/drive/MyDrive/CRISM/Jezero/mosaic_rgb/frt000047a3_07_sr166j_mtr3_indices_eqc.tif`) containing the 3 extracted bands and an RGB PNG quicklook (e.g., `/content/drive/MyDrive/CRISM/Jezero/mosaic_rgb/frt000047a3_07_sr166j_mtr3_RGB.png`) are generated.
+*   **`jezero_CRISM_RGB_mosaic.png`**: This is the main false-color RGB image of the Jezero Crater mosaic, showing the D2300 (Red), BD2210 (Green), and BD1900 (Blue) bands. It includes an alpha channel for transparency in areas without data and is displayed with Lat/Lon axes and a colorbar.
+*   **`jezero_CRISM_RGB_mosaic_meshed.png`**: The same RGB mosaic image but with a 100x100 mesh grid overlaid, and axes labeled with mesh cell indices, saved and displayed.
+*   **`jezero_CRISM_indices_mosaic.tif`**: A 3-band GeoTIFF file containing the mosaicked D2300, BD2210, and BD1900 values for the entire Jezero region processed (`/content/drive/MyDrive/CRISM/Jezero/mosaic_rgb/jezero_CRISM_indices_mosaic.tif`).
+*   **`mesh_mineral_averages.csv`**: A CSV file listing the `x`, `y` coordinates of each mesh cell and the average `Avg_D2300`, `Avg_BD2210`, and `Avg_BD1900` values for that cell (`/content/drive/MyDrive/CRISM/Jezero/mosaic_rgb/mesh_mineral_averages.csv`). Cells with no data have 0 for average values.
+*   **`mesh_mineral_averages_percentages.csv`**: An updated CSV file that includes the normalized values (`Normalized_D2300`, `Normalized_BD2210`, `Normalized_BD1900`) and the relative percentage columns (`% Fe/Mg`, `% Al-OH`, `% H2O`) for each mesh cell (`/content/drive/MyDrive/CRISM/Jezero/mosaic_rgb/mesh_mineral_averages_percentages.csv`).
+*   **Histograms of Mineral Percentages**: Three histograms visualizing the distribution of % Fe/Mg, % Al-OH, and % H2O among the mesh cells with valid data.
+*   **Pie Chart of Average Mineral Composition**: A pie chart illustrating the overall average relative percentages of Fe/Mg Smectite, Al-OH Minerals, and Hydrated Silica/H2O across the processed area.
+
 
 ---
 
