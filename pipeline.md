@@ -14,7 +14,7 @@ flowchart TB
     direction TB
         M_proc["<b>Pre-processing</b><br>projection, resampling, 100×100 grid"]
         M_feat["<b>Feature extraction</b><br>slope, roughness"]
-        M_dec["<b>Decision criteria</b><br>slope &lt; 30° and hazard flags"]
+        M_dec["<b>Decision criteria</b><br>slope &lt; 10° and hazard flags"]
         M_out["<b>Feature table</b><br>per grid cell"]
   end
  subgraph CRISM_PIPE["<b>CRISM pipeline</b>"]
