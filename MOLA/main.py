@@ -1,3 +1,7 @@
+# Owner: Zuzanna Jacyna
+# Affiliation: Politechnika Warszawska
+# Last update: 13/11/2025
+
 # mola_slope_roughness.py
 import os
 import re
