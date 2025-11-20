@@ -1,3 +1,8 @@
+# Owner: Zuzanna Jacyna
+# Affiliation: Politechnika Warszawska
+# Last update: 13/11/2025
+
+
 import pandas as pd
 import numpy as np
 
