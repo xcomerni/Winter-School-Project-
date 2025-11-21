@@ -2,6 +2,9 @@
 
 This repository contains the full processing and analysis pipeline used during the **Winter School** project to evaluate potential landing sites in **Jezero crater (Mars)**.
 
+Owners:
+Michelle Vrapi & Zuzanna Jacyna
+
 The workflow integrates:
 
 - **MOLA** topography (slope / roughness);
