@@ -1,4 +1,4 @@
-# Winter School Project – Detection of ancient water traces and optimal landing sites on Mars
+# Detection of ancient water traces and optimal landing sites on Mars
 
 This repository contains the full processing and analysis pipeline used during the **Winter School** project to evaluate potential landing sites in **Jezero crater (Mars)**.
 
