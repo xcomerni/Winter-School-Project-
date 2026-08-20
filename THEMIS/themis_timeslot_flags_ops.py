@@ -14,7 +14,7 @@ import numpy as np
 IN_CSV  = "themis_ML_data_100x100.csv"
 OUT_CSV = "themis_timeslot_flags_ops.csv"
 
-# Time fascias (as in your CSV)
+# Time fascias 
 TIMES = ["5_30AM","7_00AM","6_30PM","7_00PM"]
 COLS  = [f"mean_temperature_{t}" for t in TIMES]
 
@@ -34,7 +34,7 @@ HEATER_MIN_C           = -100.0        # acceptable with heater (conservative)
 HELI_SURVIVAL_MIN_C    = -100.0        # nighttime survival
 HELI_ENERGY_PREF_MIN_C = -70.0         # preferable for consumption/heaters
 
-# 5) NEW: minimum STRICT threshold per slot (energy-friendly by slot)
+# 5) Minimum STRICT threshold per slot (energy-friendly by slot)
 #    - morning: slightly colder allowed
 #    - evening: expected slightly warmer, less severe threshold (-60)
 STRICT_MIN_BY_SLOT = {
@@ -140,7 +140,7 @@ def main():
         df[heli_energy_ok] = energy_ok
         df[heli_reason]    = h_reason
 
-        # 5) COMBINED — reason for the first veto
+        # 5) COMBINED 
         def slot_strict_reason(i):
             if not df.loc[i, q_ok_col]:        return df.loc[i, q_reason_col]
             if not df.loc[i, rover_ok_strict]: return f"fail: rover({df.loc[i, rover_reason]})"
@@ -178,7 +178,7 @@ def main():
 
     df[out_cols].to_csv(OUT_CSV, index=False)
 
-    # Very useful summary to understand the distribution
+    # Summary
     for t in TIMES:
         gs = df[f"SLOT_GOOD_strict_{t}"].mean()
         gf = df[f"SLOT_GOOD_soft_{t}"].mean()
