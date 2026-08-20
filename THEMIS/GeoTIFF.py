@@ -22,7 +22,7 @@ except Exception:
 #   path = "/content/drive/MyDrive/THEMIS"  # on Drive
 path = "/content/drive/MyDrive/winter_school/INTERSTELLAR_ALLIANCE/THEMIS/michelle version/data/all_data"
 
-# ====================== LST INDEX (as in your script) ======================
+# ====================== LST INDEX ======================
 import glob, os, re, xml.etree.ElementTree as ET
 import pandas as pd
 
@@ -104,8 +104,8 @@ from rasterio.transform import from_bounds, Affine
 from rasterio.crs import CRS
 import matplotlib.pyplot as plt
 
-# -------- CONFIG: specify your XMLs for each band --------
-# Glob patterns are also accepted. You can use .xml or .img (the script tries to find the matching .xml).
+# -------- CONFIG: specify XMLs for each band --------
+# Glob patterns are also accepted. Use .xml or .img (the script tries to find the matching .xml).
 
 # band 1: 5:30
 # band 2: 7:00
@@ -250,7 +250,7 @@ def mosaic_median_count(paths, dst_crs, dst_transform, W, H, label):
     valid = np.isfinite(S)
     count = valid.sum(axis=0).astype("float32")
     with np.errstate(all="ignore"):
-        med = np.nanmedian(S, axis=0).astype("float32")  # same robust choice as your script
+        med = np.nanmedian(S, axis=0).astype("float32")  
     med[count==0] = np.nan
     print(f"[{label}] scene={S.shape[0]}, coverage={(count>0).mean()*100:.1f}%")
     return med, count
@@ -302,7 +302,7 @@ print(f"res target ~{TARGET_RES_M:.1f} m/px")
 dst_crs, dst_tf, W, H, lon0, TARGET_RES_M = make_grid(BBOX_DEG, TARGET_RES_M)
 print(f"griglia {W}x{H} | CRS eqc lon0≈{0.5*(BBOX_DEG[0]+BBOX_DEG[2]):.3f}")
 
-# (Audit) print bounds read by the parser
+# Print bounds read by the parser
 for fp in tutte:
     print(os.path.basename(fp), "bounds:", parse_pds4_bounds(fp))
 
@@ -350,7 +350,7 @@ if all_bt_values_for_global_scale:
     global_hi = np.percentile(all_bt_values_flat, 98)
     print(f"[info] Global temperature range (2nd-98th percentile): {global_lo:.2f}K - {global_hi:.2f}K")
 
-# Loop again to save TIFs
+# Save TIFs
 for nome, data in fasce_data.items():
     bt  = data["bt"]
     cnt = data["cnt"]
@@ -358,7 +358,7 @@ for nome, data in fasce_data.items():
     # Get the time string and sanitize it for filename
     time_str = fascia_times.get(nome, "Unknown_Time").replace(" ", "").replace(":", "_")
 
-    # Saves (same formats as your script)
+    # Save
     tif_bt   = f"/content/themis_BT_{time_str}_median.tif"
     tif_cnt  = f"/content/themis_BT_{time_str}_count.tif"
     save_tif(tif_bt,  bt,  dst_tf, dst_crs)
