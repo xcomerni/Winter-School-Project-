@@ -1,5 +1,8 @@
 # Detection of ancient water traces and optimal landing sites on Mars
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23004061.svg)](https://doi.org/10.5281/zenodo.23004061)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
+
 This repository contains the full processing and analysis pipeline used to evaluate potential landing sites in **Jezero crater (Mars)**.
 
 **Owners**: Michelle Vrapi & Zuzanna Jacyna
