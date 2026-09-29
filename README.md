@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23004061.svg)](https://doi.org/10.5281/zenodo.23004061)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
+[![Zenodo views](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F23004061&query=%24.stats.unique_views&label=Zenodo%20views&color=blue)](https://zenodo.org/records/23004061)
+[![Zenodo downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fzenodo.org%2Fapi%2Frecords%2F23004061&query=%24.stats.unique_downloads&label=Zenodo%20downloads&color=green)](https://zenodo.org/records/23004061)
 
 This repository contains the full processing and analysis pipeline used to evaluate potential landing sites in **Jezero crater (Mars)**.
 
